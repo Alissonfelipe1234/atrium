@@ -1,0 +1,115 @@
+{% extends "base-site.html" %}
+
+{% block title %} Dashboard {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+<link href='http://fonts.googleapis.com/css?family=Quicksand' rel='stylesheet' type='text/css'>
+{% endblock stylesheets %}
+
+{% block content %}
+
+<div class="main-content-container container-fluid px-4">
+    <div class="logo-font h1 text-primary mx-auto text-center font-weight-bold mt-5 pt-5">ATRIUM</div>
+    <nav class="navbar navbar-light flex-md-nowrap">
+          <form onsubmit="location.href='/search?q=' + $('#q').val(); return false;" method="GET" class="main-navbar__search w-100 d-none d-md-flex d-lg-flex">
+              <div class="input-group input-group-seamless ml-3 mt-5 pt-5">
+                  
+                  <input
+                      class="navbar-search form-control input-lg text-center text-3em"
+                      type="text"
+                      value="{{ query }}"
+                      aria-label="Search"
+                      id='q'
+                  >
+                  <div class="position-relative float-right ml-auto ">
+                      <div class="input-group-text border-0 p-2">
+                          <i class="fas fa-search fa-5x"></i>
+                      </div>
+                  </div>
+              </div>
+          </form>
+          <form onsubmit="location.href='/search?q=' + $('#q-mobile').val(); return false;" method="GET" class="main-navbar__search w-100 d-sm-flex d-md-none">
+              <div class="input-group input-group-seamless px-auto mt-5 pt-5">
+                  <input
+                      class="navbar-search form-control text-center text-1em"
+                      type="text"
+                      value="{{ query }}"
+                      aria-label="Search"
+                      id='q-mobile'
+                  >
+              </div>
+          </form>
+      </nav>
+</div>
+  
+<div class="modal" tabindex="-1" role="dialog" id="alerta">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title text-white">Alerta sobre automedicação e valores de medicamentos</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>A plataforma Atrium reforça o perigo da automedicação e seus efeitos, postados no ministério da saude: <a target="_blank"  href='http://www.blog.saude.gov.br/index.php/34310-automedicacao'>fonte</a></p>
+        <p>Outro fator importante: o site compara os preços mas não compara a dosagem, quantidade e método de aplicação. Tenha esse cuidado quando ver diferenças exorbitantes</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+<script>
+// Create cookie
+function createCookie(name, value, days) {
+  var expires
+
+  if (days) {
+    var date = new Date()
+    date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000)
+    expires = '; expires=' + date.toGMTString()
+  } else {
+    expires = ''
+  }
+
+  document.cookie = name + '=' + value + expires + '; path=/'
+}
+
+// Read cookie
+function readCookie(name) {
+  var nameEQ = name + '='
+  var ca = document.cookie.split(';')
+
+  for (var i = 0; i < ca.length; i++) {
+    var c = ca[i]
+    while (c.charAt(0) === ' ') {
+      c = c.substring(1, c.length)
+    }
+    if (c.indexOf(nameEQ) === 0) {
+      return c.substring(nameEQ.length, c.length)
+    }
+  }
+
+  return null
+}
+
+// Erase cookie
+function eraseCookie(name) {
+  createCookie(name, '', -1)
+}
+$(document).ready(function() {
+    if (readCookie('alertou') == null) {
+        $('#alerta').modal('show');
+        createCookie('alertou', '1', 20)
+    }
+});
+</script>
+{% endblock javascripts %}

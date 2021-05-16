@@ -1,0 +1,21 @@
+{
+  "name": "atrium",
+  "version": "0.1.0",
+  "description": "Flask dashboard for medicaments price",
+  "scripts": {
+    "lint": "eslint ."
+  },
+  "engines": {
+    "node": "8.11.3"
+  },
+  "devDependencies": {
+    "eslint": "5.0.0",
+    "eslint-config-google": "0.9.1"
+  },,
+  "keywords": [
+    "flask",
+    "dashboard",
+    "atrium"
+  ],
+  "author": "Alisson Felipe"
+}

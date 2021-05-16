@@ -1,0 +1,23 @@
+{% if query|length > 0 %}
+  <div class="main-navbar sticky-top bg-white">
+      <nav class="navbar align-items-stretch navbar-light flex-md-nowrap p-0">
+          <form onsubmit="location.href='/search?q=' + $('#q').val(); return false;" method="GET" class="main-navbar__search w-100 d-none d-md-flex d-lg-flex">
+              <div class="input-group input-group-seamless ml-3">
+                  <div class="input-group-prepend">
+                      <div class="input-group-text">
+                          <i class="fas fa-search"></i>
+                      </div>
+                  </div>
+                  <input
+                      class="navbar-search form-control input-lg text-center text-2em"
+                      type="text"
+                      value="{{ query }}"
+                      aria-label="Search"
+                      id='q'
+                  >
+              </div>
+          </form>
+      </nav>
+  </div>
+
+{% endif %}  

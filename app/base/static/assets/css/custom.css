@@ -1,0 +1,26 @@
+.text-2em{
+    font-size: 2em !important;
+}
+.text-3em{
+    font-size: 3em !important;
+}
+.text-1-2em{
+    font-size: 1.2em !important;
+}
+.logo-font { 
+	font-family: "Quicksand", Verdana, Helvetica, Arial, sans-serif;
+}
+.navbar-center {
+    position: absolute;
+    left: 50%;
+    transform: translatex(-50%);
+}
+.min-vw-100{
+    width: 100vw;
+}
+@media (max-width: 576px) {
+    .mt-sm--2{
+        margin-top: -5em;
+        margin-bottom: 3em;
+    }
+}

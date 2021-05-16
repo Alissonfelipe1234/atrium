@@ -1,0 +1,50 @@
+{% extends "base-site.html" %}
+
+{% block title %} Search {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <div class="main-content-container px-4">
+      <!-- Page Header -->
+      <div class="page-header row no-gutters py-4">
+        <div class="col-12 col-sm-4 text-center text-sm-left mb-0">
+          <span class="text-uppercase page-subtitle">{{results|length}} results </span>
+          <h3 class="page-title">Search</h3>
+        </div>
+      </div>
+      <!-- End Page Header -->
+      
+      <!-- Default Light Table -->
+      <div class="row pb-5">
+        <div class="col bg-light">
+          <div class="card card-small mb-4">
+            <div class="card-header border-bottom mb-3 row">
+              <div class="col-4 lead"> Nome </div>
+              <div class="col-4 lead"> Fabricante </div>
+              <div class="col-2 lead text-center"> Preco Minímo </div>
+              <div class="col-2 lead text-center"> Preco Máximo </div>
+            </div>
+            {% for key,value in results.iterrows() %}
+              <a href="/info?id={{ value['GGREM'] }}">
+                <div class="ml-2  p-0 pb-3 row ">
+                  <div class="col-4 lead"> {{ value['PRODUTO'].capitalize() }} </div>
+                  <div class="col-4 "> {{ value['LABORATORIO'].capitalize() }} </div>
+                  <div class="col-2 text-center"> {{ value['MIN'] }} </div>
+                  <div class="col-2 text-center"> {{ value['MAX'] }} </div>
+                </div>
+              </a>
+              <hr/>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      <!-- End Default Light Table -->
+    </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

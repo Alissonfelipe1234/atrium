@@ -1,0 +1,370 @@
+{% extends "base-site.html" %}
+
+{% block title %} Dashboard {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+<div class="main-content-container container-fluid px-4">
+    <!-- Page Header -->
+    <div class="page-header row no-gutters py-4">
+      <div class="col-12 col-sm-4 text-center text-sm-left mb-0">
+        <h3 class="page-title font-weight-bold">{{ result['PRODUTO'].iloc[0] }}</h3>
+      </div>
+    </div>
+    <!-- End Page Header -->
+    <!-- Small Stats Blocks -->
+    <div class="row">
+      <div class='col-4'>
+        <h4 class="page-title">Preço Mínimo</h4>
+        <h3 class="count ml-5 font-weight-bold">{{ result['MIN'].iloc[0] }}</h3>
+      </div>
+      <div class='col-4'>
+        <h4 class="page-title">Preço Máximo</h4>
+        <h3 class="count ml-5 font-weight-bold">{{ result['MAX'].iloc[0] }}</h3>
+      </div>
+      <div class="col-2">
+        <div class="stats-small stats-small--1 card card-small">
+          <div class="card-body pb-4">
+            <div class="d-flex flex-column m-auto">
+              <div class="stats-small__data text-center">
+                <span class="stats-small__label text-uppercase">Inflação correlação</span>
+                <h6 class="stats-small__value count my-3">{{ data['correlation'] }}</h6>
+              </div>
+            </div>
+            <canvas height="120" class="small_graphic-1"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="col-2">
+        <div class="stats-small stats-small--1 card card-small">
+          <div class="card-body p-0 d-flex">
+            <div class="d-flex flex-column m-auto">
+              <div class="stats-small__data text-center">
+                <span class="stats-small__label text-uppercase">Acumulado 12 meses</span>
+                <h6 class="stats-small__value count my-3">{{ data['variation'] }} %</h6>
+              </div>
+            </div>
+            <canvas height="120" class="small_graphic-2"></canvas>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="col-8 mb-4">
+        <div class="card card-small">
+          <div class="card-header border-bottom">
+            <h6 class="m-0">Histórico de preço</h6>
+          </div>
+          <div class="card-body pt-0">
+            <canvas height="130" style="max-width: 100% !important;" class="historico-preco"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="col-2 mt-3">
+        <div class="stats-small stats-small--1 card card-small">
+          <div class="card-body pb-4">
+            <div class="d-flex flex-column m-auto">
+              <div class="stats-small__data text-center">
+                <span class="stats-small__label text-uppercase">Empresa correlação</span>
+                <h6 class="stats-small__value count my-3">{{ data['correlation_factory'] }}</h6>
+              </div>
+            </div>
+            <canvas height="120" class="small_graphic-3"></canvas>
+          </div>
+        </div>
+        <h4 class="page-title mt-5">Descricao</h4>
+        <div class="count">{{ result['DESCRICAO'].iloc[0] }}</div>
+        <h4 class="page-title mt-5">Príncipio Ativo</h4>
+        <div class="count text-capitalize">{{ result['SUBSTANCIA'].iloc[0].capitalize() }}</div>
+        <h3 class="page-title mt-5 text-info">{{ data['similar']|length}} similares entre {{ data['similar_less'] }} e {{ data['similar_more'] }}</h3>
+      </div>
+      <div class="col-2 mt-3">
+        <div class="stats-small stats-small--1 card card-small">
+          <div class="card-body pb-4">
+            <div class="d-flex flex-column m-auto">
+              <div class="stats-small__data text-center">
+                <span class="stats-small__label text-uppercase">Príncipio correlação</span>
+                <h6 class="stats-small__value count my-3">{{ data['correlation_similar'] }}</h6>
+              </div>
+            </div>
+            <canvas height="120" class="small_graphic-4"></canvas>
+          </div>
+        </div>
+        <h4 class="page-title mt-5">Necessário Receita</h4>
+        <div class="count text-capitalize">
+        {% if result['RECEITA'].iloc[0] %}
+            Sim
+        {% else %}
+            Não
+        {% endif %}
+        </div>
+        <h4 class="page-title mt-5">Tarja</h4>
+        <div class="count text-capitalize">{{ result['TARJA'].iloc[0].capitalize() }}</div>
+        <h4 class="page-title mt-5">Fabricante</h4>
+        <div class="count text-capitalize">{{ result['LABORATORIO'].iloc[0].capitalize() }}</div>
+        
+      </div>
+    </div>
+    <!-- End Small Stats Blocks -->
+    <div class="row">
+      <!-- End Users Stats -->
+      <!-- Top Referrals Component -->
+      <div class="col-8 mx-auto mb-4 pb-5">
+        <div class="card card-small">
+          <div class="card-header border-bottom">
+            <h4 class="m-0">Medicamentos com mesmo principio ativo:</h4>
+          </div>
+          <div class="card-body p-0">
+            <ul class="list-group list-group-small list-group-flush">
+            {% for key,value in data['similar'].head(10).iterrows() %}
+              <a href="/info?id={{ value['GGREM'] }}">
+              <li class="list-group-item d-flex px-3">
+                <span class="text-semibold text-fiord-blue">{{ value['PRODUTO'].capitalize() }}</span>
+                <span class="ml-auto text-right text-semibold text-reagent-gray">{{ value['MIN'] }}</span>
+              </li>
+              </a>
+              <hr/>
+            {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+      <!-- End Top Referrals Component -->
+    </div>
+ </div>
+  
+
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+
+  <script>
+
+  'use strict';
+
+  (function ($) {
+    $(document).ready(function () {
+      //
+      // Small Stats
+      //
+
+      // Datasets
+      var small_data = [
+        {
+          backgroundColor: 'rgba(0, 184, 216, 0.1)',
+          borderColor: 'rgb(0, 184, 216)',
+          data: [
+            {% for key,value in data['inflation'].iterrows() %}
+              {{ value['inflation'] }},
+            {% endfor %}
+          ],
+        },
+        {
+          backgroundColor: 'rgba(23,198,113,0.1)',
+          borderColor: 'rgb(23,198,113)',
+          data: [1, 2, 3, 3, 3, 4, 4, 3, 2, 3, 4, 3, 6]
+        },
+        {
+          backgroundColor: 'rgba(255, 51, 0, 0.1)',
+          borderColor: 'rgb(255, 51, 0)',
+          data: [
+            {% for key,value in data['same_factory_todos_mean'].iteritems() %}
+              {{ value }},
+            {% endfor %}
+          ]
+        }
+        ,
+        {
+          backgroundColor: 'rgba(204, 204, 0, 0.1)',
+          borderColor: 'rgb(204, 204, 0)',
+          data: [
+            {% for key,value in data['similar_todos_mean'].iteritems() %}
+              {{ value }},
+            {% endfor %}
+          ]
+        }
+      ];
+
+      // Options
+      function small_option(max) {
+        return {
+          maintainAspectRatio: true,
+          responsive: true,
+          legend: {
+            display: false
+          },
+          tooltips: {
+            enabled: false,
+            custom: false
+          },
+          elements: {
+            point: {
+              radius: 0
+            },
+            line: {
+              tension: 0.3
+            }
+          },
+          scales: {
+            xAxes: [{
+              gridLines: false,
+              scaleLabel: false,
+              ticks: {
+                display: false
+              }
+            }],
+            yAxes: [{
+              gridLines: false,
+              scaleLabel: false,
+              ticks: {
+                display: false,
+                suggestedMax: max
+              }
+            }],
+          },
+        };
+      }
+
+      // Generate the small charts
+      small_data.map(function (el, index) {
+        var chartOptions = small_option(Math.max.apply(Math, el.data) + 1);
+        var ctx = document.getElementsByClassName('small_graphic-' + (index + 1));
+        new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+            datasets: [{
+              label: 'tax',
+              fill: 'start',
+              data: el.data,
+              backgroundColor: el.backgroundColor,
+              borderColor: el.borderColor,
+              borderWidth: 1.5,
+            }]
+          },
+          options: chartOptions
+        });
+      });
+
+
+      var bouCtx = document.getElementsByClassName('historico-preco')[0];
+
+      // Data
+      var historico = {
+        // Generate the days labels on the X axis.
+        
+        labels: [
+          {% for key,value in result.iloc[::-1].iterrows() %}
+            '{{ value['DATA'] }}',
+          {% endfor %}
+        ],
+        datasets: [{
+          label: 'Preço Mínimo',
+          fill: 'start',
+          data: [
+            {% for key,value in result.iloc[::-1].iterrows() %}
+              {{ value['MIN'] }},
+            {% endfor %}
+          ],
+          backgroundColor: 'rgba(255,51,20,0.1)',
+          borderColor: '#d92121',
+          pointBackgroundColor: '#ffffff',
+          pointHoverBackgroundColor: '#d92121',
+          borderWidth: 2,
+          pointRadius: 0,
+          pointHoverRadius: 2,
+          pointBorderColor: '#d92121'
+        }, {
+          label: 'Preço Máximo',
+          fill: 'start',
+          data: [
+            {% for key,value in result.iloc[::-1].iterrows() %}
+              {{ value['MAX']}},
+            {% endfor %}
+          ],
+          backgroundColor: 'rgba(0,123,255,0.1)',
+          borderColor: 'rgba(0,123,255,1)',
+          pointBackgroundColor: '#ffffff',
+          pointHoverBackgroundColor: 'rgb(0,123,255)',
+          borderWidth: 2,
+          pointRadius: 0,
+          pointHoverRadius: 3
+        }]
+      };
+
+      // Options
+      var bouOptions = {
+        responsive: true,
+        legend: {
+          position: 'top'
+        },
+        elements: {
+          line: {
+            tension: 0.3
+          },
+          point: {
+            radius: 0
+          }
+        },
+        scales: {
+          xAxes: [{
+            gridLines: false,
+            ticks: {
+              callback: function (tick, index) {
+              }
+            }
+          }],
+          yAxes: [{
+            ticks: {
+              suggestedMax: 45,
+              callback: function (tick, index, ticks) {
+                if (tick === 0) {
+                  return tick;
+                }
+                // Format the amounts using Ks for thousands.
+                return tick > 999 ? (tick/ 1000).toFixed(1) + 'K' : tick;
+              }
+            }
+          }]
+        },
+        // Uncomment the next lines in order to disable the animations.
+        // animation: {
+        //   duration: 0
+        // },
+        hover: {
+          mode: 'nearest',
+          intersect: false
+        },
+        tooltips: {
+          custom: false,
+          mode: 'nearest',
+          intersect: false
+        }
+      };
+
+      // Generate the Analytics Overview chart.
+      window.HistChart = new Chart(bouCtx, {
+        type: 'LineWithLine',
+        data: historico,
+        options: bouOptions
+      });
+
+      // Hide initially the first and last analytics overview chart points.
+      // They can still be triggered on hover.
+      var aocMeta = HistChart.getDatasetMeta(0);
+      aocMeta.data[0]._model.radius = 0;
+      aocMeta.data[historico.datasets[0].data.length - 1]._model.radius = 0;
+
+      // Render the chart.
+      window.HistChart.render();
+
+    });
+  })(jQuery);
+</script>
+
+{% endblock javascripts %}
