@@ -1,14 +1,13 @@
 from app.home import blueprint
 from flask import render_template, redirect, url_for, request
 from flask_login import login_required, current_user
-from app import login_manager
 from jinja2 import TemplateNotFound
 
 import pathlib
 import pandas as pd
 import numpy as np
 
-precos = pd.read_feather('cache/precos.feather')
+precos = pd.read_feather('cache/todos_data.feather')
 inflation = pd.read_feather('cache/inflation.feather')
 precos_mes = precos[precos['DATA'] == pd.Timestamp(2020, 8, 1)].dropna(subset=['SUBSTANCIA'])
 
@@ -32,11 +31,9 @@ def info():
     global precos, precos_mes
 
     id = request.args.get('id', '')
-    result = precos.query('GGREM == @id', engine='python')
-
+    result = precos.query('GGREM == ' + id)
     variation = round(get_percentage(result.head(1)['MAX'].iloc[0], result.tail(1)['MAX'].iloc[0]), 2)
     correlation = round(result.reset_index()['MIN'].corr(inflation['inflation']), 2)
-
     substancia = result.SUBSTANCIA.iloc[0]
     factory = result.LABORATORIO.iloc[0]
     similar = precos_mes.loc[precos_mes.SUBSTANCIA.str.contains(substancia, na=False)]
@@ -51,7 +48,10 @@ def info():
     correlation_factory = round(same_factory_todos_mean.corr(inflation['inflation']), 2)
 
     similar_less = similar.sort_values(by=['MIN']).head(1)['MIN'].iloc[0]
-    similar_more = similar.sort_values(by=['MAX']).dropna(subset=['MAX']).tail(1)['MAX'].iloc[0]
+    try:
+        similar_more = similar.sort_values(by=['MAX']).dropna(subset=['MAX']).tail(1)['MAX'].iloc[0]
+    except:
+        similar_more = 'ilimitado'
     
     data = {
         "similar": similar,
